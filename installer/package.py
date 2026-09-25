@@ -6,6 +6,7 @@ The GitHub workflow runs this on Windows and Linux. The payload (translated
 strings, harakat glyph spec, manifest) comes from tools/build.py and is
 committed, so packaging needs no game files.
 """
+import os
 import sys
 from pathlib import Path
 
@@ -21,9 +22,9 @@ PyInstaller.__main__.run([
     "--paths", str(ROOT / "installer"),
     "--hidden-import", "patch",
     "--collect-all", "UnityPy",
-    "--add-data", f"{ROOT / 'installer/payload'}:payload",
-    "--add-data", f"{ROOT / 'fonts/NotoSansArabic-Medium.ttf'}:payload",
-    "--add-data", f"{ROOT / 'fonts/OFL.txt'}:payload",
+    "--add-data", f"{ROOT / 'installer/payload'}{os.pathsep}payload",
+    "--add-data", f"{ROOT / 'fonts/NotoSansArabic-Medium.ttf'}{os.pathsep}payload",
+    "--add-data", f"{ROOT / 'fonts/OFL.txt'}{os.pathsep}payload",
     "--distpath", str(ROOT / "dist"),
     "--workpath", str(ROOT / "build/pyinstaller"),
     "--specpath", str(ROOT / "build/pyinstaller"),
