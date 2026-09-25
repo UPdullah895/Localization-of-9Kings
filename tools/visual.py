@@ -258,13 +258,13 @@ def _levels(units: list[Unit]) -> list[int]:
         if t[i] == "NSM":
             t[i] = prev
         prev = t[i]
-    strong = "R"                                 # W2, W3
-    for i in range(n):
-        if t[i] in ("L", "R", "AL"):
-            strong = t[i]
-        elif t[i] == "EN" and strong == "AL":
-            t[i] = "AN"
-    t = ["R" if x == "AL" else x for x in t]
+    # W2 (EN after Arabic letters becomes AN) is skipped on purpose: every number
+    # here is a Latin-digit game value, and as AN it would lose its sign and percent
+    # (W5 only joins ET to EN), so "+50%" would display as "%50+".
+    t = ["R" if x == "AL" else x for x in t]     # W3
+    for i in range(n - 1):                       # a sign directly before a number is part
+        if t[i] == "ES" and t[i + 1] == "EN" and (i == 0 or t[i - 1] != "EN"):   # of it: "+50"
+            t[i] = "EN"
     for i in range(1, n - 1):                    # W4
         if t[i] == "ES" and t[i - 1] == t[i + 1] == "EN":
             t[i] = "EN"
@@ -369,24 +369,26 @@ class Metrics:
 
 
 def _wrap(units: list[Unit], max_em: float, metrics: Metrics) -> list[list[Unit]]:
-    words, cur = [], []
+    """Greedy word wrap. The original space units are kept (they carry their own tags);
+    the space a line breaks at is dropped."""
+    words, spaces, cur = [], [], []
     for u in units:
         if u.text == " " and not u.cls:
             words.append(cur)
+            spaces.append(u)
             cur = []
         else:
             cur.append(u)
     words.append(cur)
-    space = metrics.width([Unit(" ", ())])
     lines, line, width = [], [], 0.0
-    for word in words:
+    for i, word in enumerate(words):
         w = metrics.width(word)
-        if line and width + space + w > max_em:
+        if i and line and width + metrics.width([spaces[i - 1]]) + w > max_em:
             lines.append(line)
             line, width = [], 0.0
-        if line:
-            line.append(Unit(" ", word[0].tags if word else line[-1].tags))
-            width += space
+        elif i:
+            line.append(spaces[i - 1])
+            width += metrics.width([spaces[i - 1]])
         line += word
         width += w
     lines.append(line)

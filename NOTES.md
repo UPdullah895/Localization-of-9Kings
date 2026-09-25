@@ -33,9 +33,12 @@ September attempt edited those bundles, which is why nothing changed.
 not re-serialize byte-identically. Field order: Term, TermType, Languages[],
 Flags[], Languages_Touch[] per term; then LanguageData {Name, Code, Flags} list.
 
-I2 ships its Arabic support (`RTLFixer`, `ApplyRTLfix`, `LanguagesRTL`), so
-Arabic is stored unshaped, in logical order; I2 shapes and reorders it at
-runtime for RTL languages. **Not yet confirmed in-game.**
+I2 ships an Arabic runtime fix (`RTLFixer`), but in this game it garbles text:
+it wraps a reversed paragraph (lines bottom-to-top), splits
+`<color=#{KINGCOLOR}>` at the inner brace, swaps {VAR1}/{VAR2} and misplaces
+harakat (all seen in-game 2026-09-25). So the column uses code `ar-001`, which
+is not in I2's RTL list, and `tools/visual.py` stores every string already
+shaped, bidi-reordered and wrapped (`translations/layout.json` sets widths).
 
 The chosen language is saved in PlayerPrefs (Wine registry,
 `pfx/user.reg` → `[Software\\SadSocket\\9Kings]`); nothing is saved until the
@@ -63,22 +66,26 @@ draw identically and all 1171 added Arabic codepoints match Noto Sans Arabic.
 Noto Sans Arabic maps every presentation form (FB50–FDFF, FE70–FEFC), which is
 what I2's shaper emits, so no extra cmap work is needed.
 
-Avoid harakat (tashkeel) in UI strings: TMP has no GPOS mark positioning.
+TMP has no GPOS mark positioning, so each letter's harakat become one zero-width
+glyph (Private Use Area) placed with Noto Sans Arabic's own anchors for that
+letter form (`visual.MarkGlyphs`, `font_merge.add_marks`).
 
 ## Status
 
-1. [x] Language pipeline built: `build.py` adds an `Arabic`/`ar` column (37
-       main-menu/options terms translated, the rest copy English) and verifies
-       only `I2Languages` changed.
-2. [x] In-game: Arabic appears in the language list; menu showed empty boxes
-       (no font yet). Confirmed 2026-09-25.
-3. [x] Arabic font merged into NotoSans-Medium (build 2). **Awaiting in-game test.**
-4. [ ] Confirm I2's runtime shaping/RTL output looks right.
+- [x] Language pipeline, font merge, in-game rendering (2026-09-25).
+- [x] Visual-order storage replaces I2's RTL fix (verified offline; in-game recheck pending).
+- [x] Full translation: 1985/1991 terms (the 6 `Format_*` number formats stay as they are).
+- [x] Installer for Windows and Linux (`installer/`), tested on Linux against a scratch copy.
+- [ ] In-game review of every screen; box widths in `layout.json` may need tuning.
+- [ ] Publish to GitHub (game version 0.9.6.5, Steam build 25462185).
 
 ## Commands
 
 ```bash
-./venv/bin/python tools/build.py            # build/data.unity3d
+./venv/bin/python tools/build.py            # build/data.unity3d + installer/payload/
+./venv/bin/python -m unittest discover tests
+./venv/bin/python tools/preview.py TERM ...  # work/preview.png, drawn like the game
+./venv/bin/python tools/merge_batch.py < batch.json   # add/revise translations
 ./venv/bin/python tools/deploy.py install   # game must be closed
 ./venv/bin/python tools/deploy.py restore
 ./venv/bin/python tools/deploy.py status

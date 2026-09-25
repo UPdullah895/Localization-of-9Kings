@@ -51,6 +51,12 @@ pits nine real players against each other.
 - Keep `\n` line breaks where the layout needs them (titles split over two lines).
 - `Format_*` terms are .NET number formats: never translate them.
 - Game title "9 Kings", emails and URLs stay in Latin script.
+- Numbers after a noun count: use the singular noun after the placeholder
+  ("{VAR1} وحدة", "{VAR1} ذهب"); the value is unknown, so plural agreement can't be chosen.
+- Humour stays in Modern Standard Arabic; no dialect words (برضو، مش، لازم),
+  except where broken grammar is the character's voice (Nature advisor).
+- Stat labels the game completes with a number ("Health: " + value) are laid out
+  left-to-right by the build ("الصحة: 50"); keep them as a label ending in a colon.
 - Digits: Western digits (0-9), matching the numbers the game inserts.
 - Diacritics (tashkeel): only where needed to prevent a misreading
   (مُلك/مَلِك، الرُّحَّل، استُخدم) or for tanween fath on adverbs (حقًّا، أيضًا). Not full
@@ -131,6 +137,21 @@ pits nine real players against each other.
 | Multiplayer / Royale | اللعب الجماعي / المعركة الملكية | |
 | medals / rank points | أوسمة / نقاط التصنيف | |
 | run (one playthrough) | جولة | |
+| quest / Quest Mode | مهمة / طور المهام | single-player authored scenarios |
+| mission (daily, multiplayer) | هدف يومي / الأهداف اليومية | kept apart from quests (مهمة) |
+| game mode (Endless, Quest, Speed) | طور | UI states (expansion mode, stats mode) use وضع |
+| Single Player / Multiplayer | لعب فردي / لعب جماعي | main menu pair |
+
+### Units and buildings that are easy to confuse
+
+| English | Arabic | Why |
+|---|---|---|
+| Ogre / Meat Troll | الغول / ترول اللحم | both were غول at first |
+| Raptor | الرابتور (ج. رابتورات) | the dinosaur, not جارح (bird of prey) |
+| Ballista | العرّادة | the classical Arabic siege weapon |
+| Castle / Citadel / Stronghold / Bastion | القلعة / الحصن / المعقل / الصرح | four fortifications, four distinct words |
+| Warper / Orbiter | طاوي المكان / الدوّار | from طيّ المكان; "orbits" its neighbours |
+| Recycler | مُعيد التدوير | المُعيد alone was unclear |
 
 ### Difficulties
 

@@ -38,6 +38,11 @@ OUT = ROOT / "build/data.unity3d"
 # The game version original/ was copied from (Application.version, Steam build id).
 GAME_VERSION, STEAM_BUILD = "0.9.6.5", "25462185"
 
+# Labels the game completes by appending a value in code ("Health: " + "50"). The
+# value always lands on the right, so the label is laid out left-to-right as a unit,
+# "الصحة: 50", instead of RTL, where the number would end up glued to the word.
+APPENDED_VALUE_LABEL = re.compile(r"^TerrainPopup_")
+
 
 def make_visual(translations: dict[str, str], merged: TTFont) -> tuple[dict[str, str], visual.MarkGlyphs]:
     widths = json.loads(LAYOUT.read_text(encoding="utf-8"))["widths"]
@@ -47,7 +52,11 @@ def make_visual(translations: dict[str, str], merged: TTFont) -> tuple[dict[str,
     for name, text in translations.items():
         max_em = next((w for pattern, w in widths.items() if re.search(pattern, name)), None)
         try:
-            out[name] = visual.visual(text, marks, metrics, max_em)
+            label = APPENDED_VALUE_LABEL.search(name) and re.fullmatch(r"([^{}]*?)(:\s*)", text)
+            if label:
+                out[name] = visual.visual(label.group(1), marks, metrics) + label.group(2)
+            else:
+                out[name] = visual.visual(text, marks, metrics, max_em)
         except ValueError as e:
             raise SystemExit(f"{name}: {e}")
     return out, marks
