@@ -47,6 +47,7 @@ LAM_ALEF = {"آ": ("ﻵ", "ﻶ"), "أ": ("ﻷ", "ﻸ"),
             "إ": ("ﻹ", "ﻺ"), "ا": ("ﻻ", "ﻼ")}
 MIRROR = dict(zip("()[]{}<>«»‹›", ")(][}{><»«›‹"))
 PUA_START = 0xE000
+NBSP = "\u00a0"
 
 
 @dataclass
@@ -406,7 +407,12 @@ def visual(text: str, marks: MarkGlyphs | None = None, metrics: Metrics | None =
         units = _shape(_parse(line, stack))
         pieces = _wrap(units, max_em, metrics) if max_em else [units]
         for piece in pieces:
-            out_lines.append(_emit(_reorder(_apply_marks(piece, marks))))
+            piece = _reorder(_apply_marks(piece, marks))
+            if max_em:
+                # TMP wraps from the left, so a line it breaks again loses its logical
+                # first word to the next line. No-break spaces leave only our breaks.
+                piece = [Unit(NBSP, u.tags, u.cls) if u.text == " " and not u.cls else u for u in piece]
+            out_lines.append(_emit(piece))
     if stack:
         raise ValueError(f"unclosed {stack} in {text!r}")
     return "\n".join(out_lines)

@@ -1,7 +1,7 @@
 {
-  "_comment": "Maximum line width, in em, for terms matching each regex (first match wins). Visual-order Arabic must be wrapped at build time: when TMP wraps it, the lines come out in reverse order. Card panel: ~13.8 em wide at its usual size, measured in-game 2026-09-25. Everything else falls back to 20 em: a line wrapped narrower than its box only costs width, one wrapped wider than its box reads bottom-to-top.",
+  "_comment": "Maximum line width, in em, for terms matching each regex (first match wins). Visual-order Arabic must be wrapped at build time: when TMP wraps it, the logical first word of each line drops to the next one. Within a wrapped line words are joined with no-break spaces so TMP cannot break it again. King-card description box: lines up to 11.49 em fit, 11.84 em and up were re-wrapped (in-game screenshots, 2026-09-26); 11.0 leaves a margin. Everything else falls back to 20 em.",
   "widths": {
-    "_[Dd]esc$": 12.5,
+    "_[Dd]esc$": 11.0,
     ".": 20
   }
 }

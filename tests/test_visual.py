@@ -70,6 +70,14 @@ class Wrapping(unittest.TestCase):
     def test_wrapped_space_keeps_its_own_tags(self):
         out = visual.visual("أ <color=red>ب</color> ج د هـ و ز ح ط ي", metrics=self.metrics, max_em=4)
         self.assertNotIn(" </color>", out)
+        self.assertNotIn("\u00a0</color>", out)
+
+    def test_wrapped_lines_cannot_be_rewrapped(self):
+        # TMP breaking a line again moved its logical first word to the next line.
+        out = visual.visual("كلمة أولى ثم كلمة ثانية ثم كلمة ثالثة", metrics=self.metrics, max_em=6)
+        self.assertNotIn(" ", out)
+        self.assertIn("\u00a0", out)
+        self.assertIn(" ", visual.visual("كلمة أولى"))            # unwrapped text: TMP may wrap it
 
 
 class Marks(unittest.TestCase):
