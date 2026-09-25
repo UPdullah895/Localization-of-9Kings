@@ -5,8 +5,10 @@
     deploy.py status    say which version the game currently has
 
 Refuses to touch the game while it is running. The pristine copy in original/
-is the backup; `install` checks the game still holds either that file or our
-build before overwriting, so it never replaces an unknown file.
+is the backup. Every install records the installed file's md5 in
+build/installed.md5, so the game's file is always recognised as the original,
+the current build, or a previous build of ours; anything else (e.g. a game
+update) is never overwritten.
 """
 from __future__ import annotations
 
@@ -20,6 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 GAME_DATA = Path.home() / ".local/share/Steam/steamapps/common/9 Kings/9Kings_Data/data.unity3d"
 ORIGINAL = ROOT / "original/data.unity3d"
 BUILD = ROOT / "build/data.unity3d"
+INSTALLED = ROOT / "build/installed.md5"
 
 
 def md5(path: Path) -> str:
@@ -40,6 +43,8 @@ def state() -> str:
         return "original"
     if BUILD.exists() and live == md5(BUILD):
         return "arabic-build"
+    if INSTALLED.exists() and live == INSTALLED.read_text().strip():
+        return "previous-arabic-build"
     return "unknown"
 
 
@@ -63,6 +68,7 @@ def main(cmd: str) -> None:
                          "(game update?). Verify game files in Steam, then re-copy original/.")
     if cmd == "install":
         copy(BUILD)
+        INSTALLED.write_text(md5(BUILD))
     elif cmd == "restore":
         copy(ORIGINAL)
     else:
