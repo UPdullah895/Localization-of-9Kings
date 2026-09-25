@@ -1,0 +1,5 @@
+original/
+build/
+work/
+venv/
+__pycache__/
