@@ -1,0 +1,6 @@
+{
+  "_comment": "Maximum line width, in em, for terms matching each regex (first match wins). Visual-order Arabic must be wrapped at build time: when TMP wraps it, the lines come out in reverse order. Terms matching nothing are never wrapped (only their explicit \\n breaks apply). Card panel: ~13.8 em wide at its usual size, measured in-game 2026-09-25.",
+  "widths": {
+    "_[Dd]esc$": 12.5
+  }
+}

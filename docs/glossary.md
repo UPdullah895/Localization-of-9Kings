@@ -53,8 +53,11 @@ pits nine real players against each other.
 - Game title "9 Kings", emails and URLs stay in Latin script.
 - Digits: Western digits (0-9), matching the numbers the game inserts.
 - Diacritics (tashkeel): only where needed to prevent a misreading
-  (مُلك/مَلِك، الرُّحَّل) or for tanween fath on adverbs (حقًّا، أيضًا). Not full vocalisation.
-  Pending in-game confirmation that marks render correctly.
+  (مُلك/مَلِك، الرُّحَّل، استُخدم) or for tanween fath on adverbs (حقًّا، أيضًا). Not full
+  vocalisation. The build places each letter's marks with the font's own anchors
+  (visual.py), so any combination renders, including shadda with a vowel.
+- Verbs: intransitive when the subject changes by itself ("Levels up target plot"
+  → يرتفع مستوى القطعة, not يرفع).
 
 ## Terms
 
@@ -93,7 +96,7 @@ pits nine real players against each other.
 | building / construction | مبنى / منشأة | |
 | tower | برج | |
 | tome | كتاب (ج. كتب) | card type; "destruction tomes" = كتب الهدم |
-| enchantment | طِلَّسم (ج. طلاسم) | card type; attached to units in stacks |
+| enchantment | تميمة (ج. تمائم) | card type; charms attached to units in stacks. Not طلسم: rare, reads as "cipher" |
 | trash | خردة | card type |
 | spell (generic) | تعويذة | |
 | summon | مُستدعى / يستدعي | |
