@@ -52,19 +52,27 @@ font pair (normal, outlined):
 | 16 Latin languages (English … Swedish) | TauSans / TauSans Outlined Bold |
 | Japanese, Chinese (Simplified), Chinese (Traditional), Korean | matching NotoSans JP/SC/TC/KR |
 
-Arabic is unlisted, so it gets the default chain; none of those fonts has
-Arabic glyphs. The CJK Noto font assets are small and their TTFs are embedded
-(5–10 MB `Font` objects), which points to dynamic TMP font assets.
-**Open: how to add an Arabic font (next step after the language pipeline works).**
+Arabic is unlisted, so it gets the default chain (EmptySans → NotoSans).
+
+NotoSans and NotoSans Outlined are **dynamic** TMP assets: both reference the
+embedded `Font` "NotoSans-Medium" (resources.assets path_id 923, 631 KB TTF),
+and TMP rasterizes missing glyphs from it at runtime. `tools/font_merge.py`
+merges `fonts/NotoSansArabic-Medium.ttf` (OFL, Noto 2.013) into that TTF, keeps
+the game font's metrics/name tables, and verifies all 3094 original codepoints
+draw identically and all 1171 added Arabic codepoints match Noto Sans Arabic.
+Noto Sans Arabic maps every presentation form (FB50–FDFF, FE70–FEFC), which is
+what I2's shaper emits, so no extra cmap work is needed.
+
+Avoid harakat (tashkeel) in UI strings: TMP has no GPOS mark positioning.
 
 ## Status
 
 1. [x] Language pipeline built: `build.py` adds an `Arabic`/`ar` column (37
        main-menu/options terms translated, the rest copy English) and verifies
        only `I2Languages` changed.
-2. [ ] In-game test: does Arabic appear in the language list, and does the menu
-       switch to it (expect empty boxes until the font step)?
-3. [ ] Arabic font.
+2. [x] In-game: Arabic appears in the language list; menu showed empty boxes
+       (no font yet). Confirmed 2026-09-25.
+3. [x] Arabic font merged into NotoSans-Medium (build 2). **Awaiting in-game test.**
 4. [ ] Confirm I2's runtime shaping/RTL output looks right.
 
 ## Commands
