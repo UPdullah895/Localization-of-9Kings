@@ -1,6 +1,6 @@
 # تعريب 9 Kings — Localization of 9 Kings
 
-تعريب كامل وغير رسمي للعبة [9 Kings](https://store.steampowered.com/app/2784470/9_Kings/) (من تطوير Sad Socket ونشر Hooded Horse).
+تعريب كامل وغير رسمي للعبة [9 Kings](https://store.steampowered.com/app/2784470/9_Kings/)
 
 An unofficial, complete Arabic localization of **9 Kings** by Sad Socket (published by Hooded Horse).
 
