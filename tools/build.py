@@ -26,6 +26,7 @@ from pathlib import Path
 
 import UnityPy
 
+import check_translations
 import font_merge
 import i2
 
@@ -46,10 +47,10 @@ def find(env, file_name: str, path_id: int):
 
 def patch_i2(raw: bytes, translations: dict[str, str]) -> bytes:
     src = i2.load(raw)
-    names = {t.name for t in src.terms}
-    unknown = sorted(set(translations) - names)
-    if unknown:
-        raise SystemExit(f"translations/ar.json has terms the game doesn't: {unknown}")
+    en = src.lang_index("en")
+    errors, _ = check_translations.check({t.name: t.languages[en] for t in src.terms}, translations)
+    if errors:
+        raise SystemExit("translation errors (run tools/check_translations.py):\n  " + "\n  ".join(errors))
     col = src.add_language(LANG_NAME, LANG_CODE, fill_from="en")
     for t in src.terms:
         if t.name in translations:
