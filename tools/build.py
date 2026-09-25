@@ -61,14 +61,14 @@ def object_digests(env) -> dict[tuple[str, int], str]:
     return {(o.assets_file.name, o.path_id): hashlib.sha1(o.get_raw_data()).hexdigest() for o in env.objects}
 
 
-def patch_font(obj) -> tuple[bytes, int, int]:
+def patch_font(obj) -> tuple[bytes, int, int, int]:
     tree = obj.read_typetree()
     if tree["m_Name"] != "NotoSans-Medium":
         raise SystemExit(f"path_id {FONT_PATH_ID} is {tree['m_Name']!r}, not NotoSans-Medium")
-    merged, kept, added = font_merge.merge(bytes(tree["m_FontData"]), ARABIC_FONT.read_bytes())
+    merged, kept, added, shifted = font_merge.merge(bytes(tree["m_FontData"]), ARABIC_FONT.read_bytes())
     tree["m_FontData"] = list(merged)
     obj.save_typetree(tree)
-    return merged, kept, added
+    return merged, kept, added, shifted
 
 
 def main() -> None:
@@ -78,7 +78,7 @@ def main() -> None:
     before = object_digests(env)
     obj = find(env, I2_FILE, I2_PATH_ID)
     obj.set_raw_data(patch_i2(obj.get_raw_data(), translations))
-    merged_ttf, kept, added = patch_font(find(env, FONT_FILE, FONT_PATH_ID))
+    merged_ttf, kept, added, shifted = patch_font(find(env, FONT_FILE, FONT_PATH_ID))
 
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_bytes(env.file.save(packer="original"))
@@ -103,7 +103,8 @@ def main() -> None:
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size} bytes)")
     print(f"languages: {len(src.languages)} (Arabic at index {col}); "
           f"{len(translations)} terms translated, {len(src.terms) - len(translations)} fall back to English")
-    print(f"font: {kept} original codepoints unchanged, {added} Arabic codepoints added")
+    print(f"font: {kept} original codepoints unchanged, {added} Arabic codepoints added, "
+          f"{shifted} overhanging forms given left clearance")
     print(f"verified: only I2Languages and NotoSans-Medium changed; "
           f"all {len(before) - 2} other objects byte-identical")
 

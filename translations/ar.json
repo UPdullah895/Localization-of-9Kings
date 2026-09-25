@@ -1,6 +1,6 @@
 {
   "MainMenu_Main_Start": "ابدأ",
-  "MainMenu_Main_Options": "الخيارات",
+  "MainMenu_Main_Options": "الإعدادات",
   "MainMenu_Main_Extras": "إضافات",
   "MainMenu_Main_Quit": "خروج",
   "MainMenu_Main_Credits": "فريق العمل",
@@ -35,5 +35,17 @@
   "MainMenu_Options_SlowDownWhenOutOfTroopsToggle": "إبطاء المعركة عند نفاد الجنود",
   "MainMenu_Options_Red": "تعطيل اللون الأحمر في الوضع اللانهائي",
   "MainMenu_Options_ResetGame": "إعادة ضبط البيانات",
-  "MainMenu_Options_Reset_Warning": "سيضيع تقدمك كله إلى الأبد.\nهل أنت متأكد من المتابعة؟"
+  "MainMenu_Options_Reset_Warning": "سيضيع تقدمك كله إلى الأبد.\nهل أنت متأكد من المتابعة؟",
+  "Options_Vsync": "المزامنة العمودية",
+  "Settings_Restore": "الافتراضي",
+  "MainMenuUI_Credits_BackBtn": "رجوع",
+  "MainMenuUI_BugReport_BackBtn": "رجوع",
+  "MainMenuUI_BugReport_DebugFileBtn": "ملف التصحيح",
+  "MainMenuUI_BugReport_Description": "مرحبا! شكرا لمساعدتنا في تطوير 9 Kings.\n\nنعمل بجد لإصلاح كل الأخطاء في هذا الإصدار التجريبي، وملاحظاتك مهمة جدا لنا.\n\nاختر \"ملف التصحيح\" لحفظ آخر جلسة لعب، وادعمنا بإرسال الملف إلى report@sadsocket.com.\n\nسنعالج المشكلة فورا.",
+  "MainMenu_Compendium": "الموسوعة",
+  "MainMenu_Surrender": "أحان وقت الاستسلام يا مولاي؟",
+  "MainMenu_EndRun": "إنهاء الجولة",
+  "MainMenu_SaveAndQuit": "حفظ وخروج",
+  "MainMenu_AreYouSure": "هل أنت متأكد؟",
+  "MainMenu_GamePaused": "إيقاف مؤقت"
 }
