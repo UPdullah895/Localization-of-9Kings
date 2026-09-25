@@ -3,3 +3,4 @@ build/
 work/
 venv/
 __pycache__/
+dist/

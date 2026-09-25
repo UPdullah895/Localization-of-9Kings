@@ -145,7 +145,9 @@ def _clear_left_overhangs(font: TTFont, codepoints: list[int]) -> dict[int, int]
 
 
 def _load(data: bytes) -> TTFont:
-    return TTFont(io.BytesIO(data))
+    # No timestamp refresh on save: the same inputs must give byte-identical fonts,
+    # so an installed game can be verified against the build's hash.
+    return TTFont(io.BytesIO(data), recalcTimestamp=False)
 
 
 def merge(base_ttf: bytes, arabic_ttf: bytes) -> tuple[bytes, int, int, int]:
@@ -164,6 +166,7 @@ def merge(base_ttf: bytes, arabic_ttf: bytes) -> tuple[bytes, int, int, int]:
             merged[tag] = base[tag]
     shifts = _clear_left_overhangs(merged, added)
     out = io.BytesIO()
+    merged.recalcTimestamp = False
     merged.save(out)
     data = out.getvalue()
 
@@ -183,3 +186,42 @@ def merge(base_ttf: bytes, arabic_ttf: bytes) -> tuple[bytes, int, int, int]:
     if check["head"].unitsPerEm != base["head"].unitsPerEm or check["hhea"].ascent != base["hhea"].ascent:
         raise ValueError("vertical metrics changed")
     return data, len(base_cmap), len(added), len(shifts)
+
+
+def add_marks(ttf: bytes, arabic_ttf: bytes, spec: dict[str, list[list]]) -> bytes:
+    """Add harakat glyphs described by visual.MarkGlyphs.spec() to a merged font.
+
+    Each entry is one zero-width glyph at a Private Use codepoint, drawn from Noto
+    Sans Arabic mark glyphs at the given offsets. Existing cmap entries must not change.
+    """
+    font, arabic = _load(ttf), _load(arabic_ttf)
+    before = font.getBestCmap().copy()
+    src = arabic.getGlyphSet()
+    order = list(font.getGlyphOrder())
+    for cp_hex, parts in spec.items():
+        cp = int(cp_hex, 16)
+        if not 0xE000 <= cp <= 0xF8FF or cp in before:
+            raise ValueError(f"U+{cp:04X}: not a free Private Use codepoint")
+        name = f"mark{cp:04X}"
+        pen = TTGlyphPen(None)
+        for glyph, x, y in parts:
+            rec = DecomposingRecordingPen(src)
+            src[glyph].draw(rec)
+            rec.replay(TransformPen(pen, (1, 0, 0, 1, x, y)))
+        font["glyf"][name] = pen.glyph()
+        font["glyf"][name].recalcBounds(font["glyf"])
+        font["hmtx"][name] = (0, font["glyf"][name].xMin)
+        order.append(name)
+        for table in font["cmap"].tables:
+            if table.isUnicode():
+                table.cmap[cp] = name
+    font.setGlyphOrder(order)
+    out = io.BytesIO()
+    font.save(out)
+    data = out.getvalue()
+    cmap = _load(data).getBestCmap()
+    if any(cmap.get(cp) != g for cp, g in before.items()):
+        raise ValueError("adding mark glyphs changed an existing cmap entry")
+    if any(int(cp, 16) not in cmap for cp in spec):
+        raise ValueError("a mark glyph is missing from the font")
+    return data

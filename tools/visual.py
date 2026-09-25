@@ -33,9 +33,6 @@ import unicodedata
 from dataclasses import dataclass
 
 from arabic_reshaper.letters import FINAL, INITIAL, ISOLATED, LETTERS_ARABIC, MEDIAL
-from fontTools.pens.recordingPen import DecomposingRecordingPen
-from fontTools.pens.transformPen import TransformPen
-from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 
 TAG = re.compile(r"<[^<>]*>")
@@ -155,7 +152,7 @@ def _shape(units: list[Unit]) -> list[Unit]:
 class MarkGlyphs:
     """Zero-width glyphs, one per (letter form, harakat) pair, positioned by GPOS anchors.
 
-    Each gets a Private Use codepoint; `add_to(font)` writes them into the merged font.
+    Each gets a Private Use codepoint; `spec()` describes them for font_merge.add_marks.
     In visual order the mark glyph sits immediately left of its letter with zero
     advance, so it is drawn from the letter's origin, exactly where the anchors place it.
     """
@@ -228,25 +225,9 @@ class MarkGlyphs:
             placed.append((mg, *pos))
         return [(g, x + dx, y) for g, x, y in placed]
 
-    def add_to(self, font: TTFont) -> None:
-        """Add every requested glyph to `font` (the merged font) and map its PUA codepoint."""
-        noto_gs = self.noto.getGlyphSet()
-        order = list(font.getGlyphOrder())
-        for (form, marks), (pua, parts) in self.glyphs.items():
-            name = f"mark{ord(pua):04X}"
-            pen = TTGlyphPen(None)
-            for g, x, y in parts:
-                rec = DecomposingRecordingPen(noto_gs)
-                noto_gs[g].draw(rec)
-                rec.replay(TransformPen(pen, (1, 0, 0, 1, x, y)))
-            font["glyf"][name] = pen.glyph()
-            font["glyf"][name].recalcBounds(font["glyf"])
-            font["hmtx"][name] = (0, font["glyf"][name].xMin)
-            order.append(name)
-            for table in font["cmap"].tables:
-                if table.isUnicode():
-                    table.cmap[ord(pua)] = name
-        font.setGlyphOrder(order)
+    def spec(self) -> dict[str, list[list]]:
+        """{PUA codepoint hex: [[Noto Sans Arabic glyph name, x, y], ...]} for font_merge.add_marks."""
+        return {f"{ord(pua):04X}": [list(p) for p in parts] for pua, parts in self.glyphs.values()}
 
 
 def _apply_marks(units: list[Unit], marks: MarkGlyphs | None) -> list[Unit]:

@@ -1,0 +1,7 @@
+# Installer and build (tools/patch.py, tools/font_merge.py, tools/i2.py)
+UnityPy==1.25.3
+fonttools==4.66.0
+lz4==4.4.5          # LZ4HC output must match the build byte for byte
+# Build only (tools/build.py, tools/visual.py, tools/preview.py)
+arabic-reshaper==3.0.1
+pillow==12.3.0
