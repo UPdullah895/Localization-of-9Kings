@@ -4,3 +4,6 @@ work/
 venv/
 __pycache__/
 dist/
+
+# Working notes from development sessions
+NOTES.md
