@@ -36,7 +36,7 @@ PAYLOAD = ROOT / "installer/payload"
 OUT = ROOT / "build/data.unity3d"
 
 # The game version original/ was copied from (Application.version, Steam build id).
-GAME_VERSION, STEAM_BUILD = "0.9.6.5", "25462185"
+GAME_VERSION, STEAM_BUILD = "0.9.8.3", "25806078"
 
 # Labels the game completes by appending a value in code ("Health: " + "50"). The
 # value always lands on the right, so the label is laid out left-to-right as a unit,

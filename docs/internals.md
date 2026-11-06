@@ -6,7 +6,7 @@ voice, what gets recreated rather than translated — see [METHOD.md](METHOD.md)
 
 ## Working on it
 
-Building needs a copy of the game's own `9Kings_Data/data.unity3d` (version 0.9.6.5) at
+Building needs a copy of the game's own `9Kings_Data/data.unity3d` (version 0.9.8.3) at
 `original/data.unity3d`. It is not in this repo and never will be.
 
 ```bash
@@ -18,6 +18,7 @@ python3 -m venv venv && ./venv/bin/pip install -r requirements.txt
 ./venv/bin/python -m unittest discover tests
 ./venv/bin/python tools/preview.py TERM ...          # work/preview.png, drawn like the game
 ./venv/bin/python tools/merge_batch.py < batch.json  # add or revise translations
+./venv/bin/python tools/diff_versions.py OLD NEW     # after a game update: added/changed/missing terms
 ./venv/bin/python tools/deploy.py install            # into the real game; it must be closed
 ./venv/bin/python tools/deploy.py restore
 ./venv/bin/python installer/package.py               # dist/9Kings-Arabic(.exe)
@@ -30,8 +31,10 @@ publishes a release.
 ## Where the text lives
 
 **I2 Localization**, not Unity Localization. Every string the UI draws is in one
-`LanguageSourceAsset` named `I2Languages` — `data.unity3d` → `resources.assets`, path_id
-12310, about 3 MB, 1,991 terms × 30 languages.
+`LanguageSourceAsset` named `I2Languages` — `data.unity3d` → `resources.assets`, about 3.2 MB,
+2,076 terms × 30 languages. Its path_id moves between game updates (12310 in 0.9.6.5,
+14199 in 0.9.8.3), so `tools/patch.py` finds it by name and by parsing, never by a
+hard-coded id.
 
 The Unity Localization bundles under `StreamingAssets/aa` are a decoy: they hold 111
 entries and say "Play" where the screen says "START". Editing them changes nothing.
@@ -53,16 +56,16 @@ the text: it wraps a reversed paragraph so the lines run bottom-to-top, it split
 misplaces harakat — all seen in-game. `ar-001` is not in I2's RTL list, so the fix never
 runs and `tools/visual.py` stores every string already shaped, reordered and wrapped.
 
-**2. The font.** `LocalizationFonts` (path_id 12270) maps a language to a font pair. The
+**2. The font.** `LocalizationFonts` maps a language to a font pair. The
 16 Latin languages get TauSans and the CJK languages get matching Noto faces; anything
 unlisted — Arabic included — falls through to EmptySans → NotoSans. Both NotoSans assets
-are **dynamic** TMP assets referencing the embedded `Font` "NotoSans-Medium"
-(path_id 923, a 631 KB TTF), and TMP rasterises missing glyphs from it at runtime. So
-`tools/font_merge.py` merges `fonts/NotoSansArabic-Medium.ttf` into that TTF, keeps the
-game font's metrics and name tables, and verifies that all 3,094 original codepoints still
-draw identically and all 1,171 added Arabic ones match Noto Sans Arabic. Noto Sans Arabic
-maps every presentation form (FB50–FDFF, FE70–FEFC), which is exactly what the shaper
-emits, so no extra cmap work is needed.
+are **dynamic** TMP assets referencing the embedded `Font` "NotoSans-Medium" (path_id 1073
+in 0.9.8.3, 923 in 0.9.6.5 — found by name, see above), a 631 KB TTF, and TMP rasterises
+missing glyphs from it at runtime. So `tools/font_merge.py` merges `fonts/NotoSansArabic-Medium.ttf`
+into that TTF, keeps the game font's metrics and name tables, and verifies that all 3,094
+original codepoints still draw identically and all 1,171 added Arabic ones match Noto Sans
+Arabic. Noto Sans Arabic maps every presentation form (FB50–FDFF, FE70–FEFC), which is
+exactly what the shaper emits, so no extra cmap work is needed.
 
 **3. Shaping and direction.** `tools/visual.py` reshapes to presentation forms and emits
 **visual order** at build time, with a bidi pass that leaves game values such as `+50%`
@@ -101,7 +104,7 @@ verifies every glyph on both sides of the merge.
 
 ## State
 
-1,985 of 1,991 terms are translated. The six left alone are `Format_*` number formats,
+2,070 of 2,076 terms are translated. The six left alone are `Format_*` number formats,
 which are not text. Box widths in `layout.json` are measured as screens are reviewed; an
 unreviewed panel may still wrap wrongly, and that is the thing to look for first when
 something looks out of order.

@@ -153,6 +153,21 @@ pits nine real players against each other.
 | Warper / Orbiter | طاوي المكان / الدوّار | from طيّ المكان; "orbits" its neighbours |
 | Recycler | مُعيد التدوير | المُعيد alone was unclear |
 
+### Added in 0.9.8.3
+
+| English | Arabic | Notes |
+|---|---|---|
+| Factory | المصنع | building; trash cards every odd year |
+| Reactor | المفاعل | building; summons rainbow units |
+| Leech | العلق | troop; steals damage and HP from neighbours |
+| Hound | الكلب | troop; its damage bonus counts digits |
+| Singularity | التفرّد | spell; unifies identical cards |
+| Accumulator | المُراكم | spell; grows while it stays in hand |
+| Daily Mayhem (was Daily Challenge) | الفوضى اليومية | the Joker's daily challenge — same voice as `Challenge_Joker*` |
+| King Points | نقاط الملك | kept apart from نقاط التصنيف (Rank Points) |
+| Season's decrees | مراسيم الموسم | |
+| View Base | عرض القاعدة | |
+
 ### Difficulties
 
 Peasant فلاح · Squire تابع · Knight فارس · Lord سيّد · Baron بارون ·

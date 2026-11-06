@@ -18,6 +18,7 @@ import UnityPy
 from PIL import Image, ImageDraw, ImageFont
 
 import i2
+import patch
 
 ROOT = Path(__file__).resolve().parent.parent
 BUILD = ROOT / "build/data.unity3d"
@@ -27,9 +28,8 @@ TAG = re.compile(r"<[^<>]*>")
 
 def main(terms: list[str]) -> None:
     env = UnityPy.load(str(BUILD))
-    objs = {(o.assets_file.name, o.path_id): o for o in env.objects}
-    src = i2.load(objs[("resources.assets", 12310)].get_raw_data())
-    font_data = bytes(objs[("resources.assets", 923)].read_typetree()["m_FontData"])
+    src = i2.load(patch.find_i2(env).get_raw_data())
+    font_data = bytes(patch.find_font(env).read_typetree()["m_FontData"])
     font = ImageFont.truetype(io.BytesIO(font_data), 40, layout_engine=ImageFont.Layout.BASIC)
     small = ImageFont.truetype(io.BytesIO(font_data), 18, layout_engine=ImageFont.Layout.BASIC)
     col = src.lang_index("ar-001")

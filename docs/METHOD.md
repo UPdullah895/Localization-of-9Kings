@@ -2,7 +2,7 @@
 
 ## Process
 
-1. **Read everything first.** All 1,991 English strings were read before translating,
+1. **Read everything first.** All 2,076 English strings were read before translating,
    to learn the game's systems (plots, troops, tomes, decrees, blessings), which
    strings are UI and which are flavour, and who is speaking in each.
 2. **Terminology before translation.** `docs/glossary.md` fixes one Arabic term per

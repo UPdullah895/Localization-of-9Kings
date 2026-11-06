@@ -63,13 +63,8 @@ def check(english: dict[str, str], arabic: dict[str, str]) -> tuple[list[str], l
 
 
 def english_terms() -> dict[str, str]:
-    import UnityPy
-    import i2
-    env = UnityPy.load(str(ROOT / "original/data.unity3d"))
-    obj = next(o for o in env.objects if o.assets_file.name == "resources.assets" and o.path_id == 12310)
-    src = i2.load(obj.get_raw_data())
-    en = src.lang_index("en")
-    return {t.name: t.languages[en] for t in src.terms}
+    import patch
+    return patch.english(ROOT / "original/data.unity3d")
 
 
 def main() -> int:
