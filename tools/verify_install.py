@@ -5,6 +5,7 @@
 Reads the game's live file: the language column, the stored strings (a few
 spot checks plus the overall count), and the Arabic codepoints in the font.
 """
+import json
 import sys
 from pathlib import Path
 
@@ -50,7 +51,11 @@ def main() -> int:
     en = src.lang_index("en")
     formats_ok = all(t.languages[col] == t.languages[en] for t in formats)
     translated = sum(1 for t in src.terms if not t.name.startswith("Format_"))
-    ok = formats_ok and translated == 2070 and arabic and forms
+    manifest = json.loads((ROOT / "installer/payload/manifest.json").read_text(encoding="utf-8"))
+    expected = manifest["terms_translated"]
+    ok = formats_ok and translated == expected and arabic and forms
+    print(f"expected    : {expected} translated terms (installer manifest)")
+    print(f"build       : {manifest['game_version']} / Steam {manifest['steam_build']}")
     print("OK" if ok else "PROBLEM")
     return 0 if ok else 1
 

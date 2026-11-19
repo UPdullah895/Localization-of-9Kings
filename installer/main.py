@@ -64,7 +64,16 @@ def game_running() -> bool:
             out = subprocess.run(["tasklist", "/FI", "IMAGENAME eq 9Kings.exe"],
                                  capture_output=True, text=True).stdout
             return "9Kings.exe" in out
-        return subprocess.run(["pgrep", "-f", "9Kings.exe"], capture_output=True).returncode == 0
+        # Match the process name exactly, and the full path only when it ends at the
+        # executable: a bare "9Kings.exe" pattern also matches any shell whose command
+        # line merely mentions it (a terminal that ran a script, for example).
+        mine = os.getpid()
+        for args in (["-x", "9Kings.exe"], ["-f", r"(^|/)9Kings\.exe( |$)"]):
+            res = subprocess.run(["pgrep", *args], capture_output=True, text=True)
+            for pid in res.stdout.split():
+                if pid.isdigit() and int(pid) != mine:
+                    return True
+        return False
     except OSError:
         return False
 
@@ -227,6 +236,9 @@ def run() -> None:
         say(f"This installer supports game version {manifest['game_version']} only, and the game's")
         say("data file does not match it. Most likely the game has been updated since this")
         say("release; check for a newer release of the translation.")
+        say()
+        say("To get a clean game file back, in Steam: right-click 9 Kings > Properties >")
+        say("Installed Files > Verify integrity of game files.")
         if game.backup.is_file() and sha256(game.backup) == manifest["original_sha256"]:
             say()
             say("A verified backup of the supported original file is present.")

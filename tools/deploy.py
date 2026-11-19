@@ -7,15 +7,20 @@
 GAME_DIR is optional: without it the Steam libraries are searched, which is
 where the game may live on another drive.
 
-Refuses to touch the game while it is running. The pristine copy in original/
-is the backup. Every install records the installed file's md5 in
-build/installed.md5, so the game's file is always recognised as the original,
-the current build, or a previous build of ours; anything else (e.g. a game
-update) is never overwritten.
+Refuses to touch the game while it is running, and refuses to install over a
+build of ours made for another game version (that file belongs to different
+game data). The pristine copy in original/ is the backup; install also writes
+the game-side backup and marker the released installer uses, so a later
+Uninstall from the installer restores the right file. Every install records
+the installed file's md5 in build/installed.md5, so the game's file is always
+recognised as the original, the current build, or a previous build of ours;
+anything else (e.g. a game update) is never overwritten.
 """
 from __future__ import annotations
 
 import hashlib
+import json
+import os
 import shutil
 import subprocess
 import sys
@@ -29,6 +34,9 @@ import steam  # noqa: E402
 ORIGINAL = ROOT / "original/data.unity3d"
 BUILD = ROOT / "build/data.unity3d"
 INSTALLED = ROOT / "build/installed.md5"
+MANIFEST = ROOT / "installer/payload/manifest.json"
+BACKUP_NAME = "data.unity3d.arabic-backup"
+MARKER_NAME = "arabic-translation.json"
 
 
 def game_data(folder: str | None = None) -> Path:
@@ -49,7 +57,16 @@ def md5(path: Path) -> str:
 
 
 def game_running() -> bool:
-    return subprocess.run(["pgrep", "-if", "9Kings.exe"], capture_output=True).returncode == 0
+    # Match the process name exactly, and the full path only when it ends at the
+    # executable: a bare "9Kings.exe" pattern also matches any shell whose command
+    # line merely mentions it (a terminal that just ran this tool, for example).
+    mine = os.getpid()
+    for args in (["-x", "9Kings.exe"], ["-f", r"(^|/)9Kings\.exe( |$)"]):
+        res = subprocess.run(["pgrep", *args], capture_output=True, text=True)
+        for pid in res.stdout.split():
+            if pid.isdigit() and int(pid) != mine:
+                return True
+    return False
 
 
 def state(live_path: Path) -> str:
@@ -71,6 +88,27 @@ def copy(src: Path, live_path: Path) -> None:
         raise SystemExit("copy verification failed")
 
 
+def keep_backup(src: Path, live_path: Path) -> None:
+    """Write the game-side backup and marker the released installer depends on.
+
+    `src` is the pristine original for the supported version: the game's own copy
+    when it is untouched, else original/. A backup left over from an earlier game
+    version is replaced, because restoring it later would put old game data back.
+    """
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    tmp = live_path.with_name(BACKUP_NAME).with_suffix(".tmp")
+    shutil.copyfile(src, tmp)
+    digest = hashlib.sha256(tmp.read_bytes()).hexdigest()
+    if digest != manifest["original_sha256"]:
+        tmp.unlink(missing_ok=True)
+        raise SystemExit("the original file does not match the installer manifest; nothing was changed")
+    tmp.replace(live_path.with_name(BACKUP_NAME))
+    live_path.with_name(MARKER_NAME).write_text(json.dumps(
+        {"game_version": manifest["game_version"],
+         "original_sha256": manifest["original_sha256"],
+         "steam_build": manifest["steam_build"]}, indent=1), encoding="utf-8")
+
+
 def main(cmd: str, folder: str | None = None) -> None:
     live_path = game_data(folder)
     current = state(live_path)
@@ -83,6 +121,16 @@ def main(cmd: str, folder: str | None = None) -> None:
         raise SystemExit("The game's data.unity3d matches neither the original nor our build "
                          "(game update?). Verify game files in Steam, then re-copy original/.")
     if cmd == "install":
+        if current == "previous-arabic-build":
+            raise SystemExit("The game currently carries an older Arabic build; its version is not "
+                             "known, so installing this one could mix two game versions.\n"
+                             "Verify the game files in Steam (Properties > Installed Files) and run "
+                             "install again.")
+        if current == "arabic-build":
+            print("already the current build; refreshing its backup from original/")
+            keep_backup(ORIGINAL, live_path)
+        else:
+            keep_backup(live_path, live_path)
         copy(BUILD, live_path)
         INSTALLED.write_text(md5(BUILD))
     elif cmd == "restore":

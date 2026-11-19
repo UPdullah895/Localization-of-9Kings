@@ -6,7 +6,7 @@ voice, what gets recreated rather than translated — see [METHOD.md](METHOD.md)
 
 ## Working on it
 
-Building needs a copy of the game's own `9Kings_Data/data.unity3d` (version 0.9.8.3) at
+Building needs a copy of the game's own `9Kings_Data/data.unity3d` (version 1.0.3.1) at
 `original/data.unity3d`. It is not in this repo and never will be.
 
 ```bash
@@ -22,6 +22,7 @@ python3 -m venv venv && ./venv/bin/pip install -r requirements.txt
 ./venv/bin/python tools/deploy.py install            # into the real game; it must be closed
 ./venv/bin/python tools/deploy.py restore
 ./venv/bin/python installer/package.py               # dist/9Kings-Arabic(.exe)
+./venv/bin/python tools/gemma_review.py < keys.json  # wording review against the local Gemma (ollama)
 ```
 
 Translations live in `translations/ar.json`, keyed by I2 term name and written in normal
@@ -32,12 +33,13 @@ publishes a release.
 
 **I2 Localization**, not Unity Localization. Every string the UI draws is in one
 `LanguageSourceAsset` named `I2Languages` — `data.unity3d` → `resources.assets`, about 3.2 MB,
-2,076 terms × 30 languages. Its path_id moves between game updates (12310 in 0.9.6.5,
-14199 in 0.9.8.3), so `tools/patch.py` finds it by name and by parsing, never by a
-hard-coded id.
+2,083 terms × 31 languages. Its path_id moves between game updates (12310 in 0.9.6.5,
+14199 in 0.9.8.3, 14763 in 1.0.3.1), so `tools/patch.py` finds it by name and by parsing,
+never by a hard-coded id.
 
-The Unity Localization bundles under `StreamingAssets/aa` are a decoy: they hold 111
-entries and say "Play" where the screen says "START". Editing them changes nothing.
+The Unity Localization bundles under `StreamingAssets/aa` are a decoy: they hold a handful
+of entries (English, Chinese, Japanese, Portuguese) and say "Play" where the screen says
+"START". Editing them changes nothing.
 
 Engine facts behind that, all verified rather than assumed: Unity 6000.3.8f1, IL2CPP,
 metadata version 39. `TypeTreeGeneratorAPI` 0.0.10 cannot load v39, so MonoBehaviours
@@ -59,8 +61,8 @@ runs and `tools/visual.py` stores every string already shaped, reordered and wra
 **2. The font.** `LocalizationFonts` maps a language to a font pair. The
 16 Latin languages get TauSans and the CJK languages get matching Noto faces; anything
 unlisted — Arabic included — falls through to EmptySans → NotoSans. Both NotoSans assets
-are **dynamic** TMP assets referencing the embedded `Font` "NotoSans-Medium" (path_id 1073
-in 0.9.8.3, 923 in 0.9.6.5 — found by name, see above), a 631 KB TTF, and TMP rasterises
+are **dynamic** TMP assets referencing the embedded `Font` "NotoSans-Medium" (path_id 557
+in 1.0.3.1, 1073 in 0.9.8.3, 923 in 0.9.6.5 — found by name, see above), a 631 KB TTF, and TMP rasterises
 missing glyphs from it at runtime. So `tools/font_merge.py` merges `fonts/NotoSansArabic-Medium.ttf`
 into that TTF, keeps the game font's metrics and name tables, and verifies that all 3,094
 original codepoints still draw identically and all 1,171 added Arabic ones match Noto Sans
@@ -104,7 +106,7 @@ verifies every glyph on both sides of the merge.
 
 ## State
 
-2,070 of 2,076 terms are translated. The six left alone are `Format_*` number formats,
+2,077 of 2,083 terms are translated. The six left alone are `Format_*` number formats,
 which are not text. Box widths in `layout.json` are measured as screens are reviewed; an
 unreviewed panel may still wrap wrongly, and that is the thing to look for first when
 something looks out of order.

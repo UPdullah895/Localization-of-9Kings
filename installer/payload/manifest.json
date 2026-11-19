@@ -1,8 +1,8 @@
 {
- "game_version": "0.9.8.3",
- "original_sha256": "d73dc342824f84a69199d77923ba97e896171a748d0d04d821fc8d7feb371730",
- "original_size": 54766876,
- "patched_sha256": "a2ec9335673eed221c9618037497cfccd4aea74fbd476794c702f9a2e39e1e4e",
- "steam_build": "25806078",
- "terms_translated": 2070
+ "game_version": "1.0.3.1",
+ "original_sha256": "a0477518b872ae32275b15fffb4afa469721f0901d6965b858c370a802204902",
+ "original_size": 55337658,
+ "patched_sha256": "b11c70b7599df5162969a247dababb1d243615f432cc04bc40a73c11b2c3b96e",
+ "steam_build": "26677340",
+ "terms_translated": 2077
 }

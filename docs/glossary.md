@@ -55,8 +55,10 @@ pits nine real players against each other.
   ("{VAR1} وحدة", "{VAR1} ذهب"); the value is unknown, so plural agreement can't be chosen.
 - Humour stays in Modern Standard Arabic; no dialect words (برضو، مش، لازم),
   except where broken grammar is the character's voice (Nature advisor).
-- Stat labels the game completes with a number ("Health: " + value) are laid out
-  left-to-right by the build ("الصحة: 50"); keep them as a label ending in a colon.
+- Stat popups (`TerrainPopup_*`): up to 0.9.8.3 the game appended the value in code
+  ("Health: " + value) and the build laid the label out left-to-right ("الصحة: 50"). From
+  1.0.3.1 the value is a placeholder inside the term, so write "الصحة: {VAR1}" and let the
+  bidi pass put the number where Arabic puts it.
 - Digits: Western digits (0-9), matching the numbers the game inserts.
 - Diacritics (tashkeel): only where needed to prevent a misreading
   (مُلك/مَلِك، الرُّحَّل، استُخدم) or for tanween fath on adverbs (حقًّا، أيضًا). Not full
@@ -167,6 +169,20 @@ pits nine real players against each other.
 | King Points | نقاط الملك | kept apart from نقاط التصنيف (Rank Points) |
 | Season's decrees | مراسيم الموسم | |
 | View Base | عرض القاعدة | |
+
+### Added in 1.0.3.1
+
+| English | Arabic | Notes |
+|---|---|---|
+| Lover Eyes (was Love Eyes) | عيون العاشق | skin |
+| Triangular Wall (was Triangle Wall) | جدار المثلثات | skin; same meaning, renamed |
+| regular perk | الميزة العادية | `Perk_Multiplayer_Authoritarian_Desc`; not a universal perk |
+| Disable Battle FX | تعطيل مؤثرات المعركة | options; two terms, same text |
+| Fast UI animations | تسريع تحريك الواجهة | options |
+| UI volume | مستوى صوت الواجهة | kept apart from مستوى المؤثرات الصوتية |
+| Disable building animations | تعطيل تحريك المباني | options |
+| New cards & decrees | بطاقات ومراسيم جديدة | multiplayer filter |
+| Warlock's passive effect | الأثر التلقائي للمشعوذ | `Policy_Polemology_Desc` was rewritten |
 
 ### Difficulties
 

@@ -26,10 +26,10 @@ import font_merge
 import i2
 
 # Path ids move between game versions (0.9.6.5 had I2 12310 / font 923,
-# 0.9.8.3 has 14199 / 1073), so objects are found by name and by parsing,
+# 1.0.3.1 has 14763 / 557), so objects are found by name and by parsing,
 # with the known ids tried first only to keep the installer fast.
 I2_FILE, FONT_FILE = "resources.assets", "resources.assets"
-I2_HINT, FONT_HINT = 14199, 1073
+I2_HINT, FONT_HINT = 14763, 557
 # Not "ar": I2 applies its runtime RTL fix to any code in its RTL list, and
 # "ar-001" (Arabic, world) is not in it. The stored text is already visual.
 LANG_NAME, LANG_CODE = "Arabic", "ar-001"
